@@ -22,7 +22,7 @@ server.use('/news', newsRouter);
 server.use('/webhooks/inbound-sms', smsRouter);
 
 server.get('/', async (req, res) => {
-    res.send('Hello World!');
+    res.send('Hello World!!');
 });
 
 server.listen(PORT, () => {
