@@ -51,5 +51,15 @@ exports.sendSMS = async (text, to) => {
 // Gets the country and language of the client based on number
 const getInfo = (number) => {
     // get insights from number
-    return ['en', 'us'];
+    let array = [];
+    vonage.numberInsight.get({level: 'basic', number: number}, (error, result) => {
+        if(error) {
+            console.error(error);
+        }
+        else {
+            array.push('en');
+            array.push(result.country_code.toLowerCase());
+        }
+    });
+    return array;
 }
