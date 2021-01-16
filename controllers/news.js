@@ -9,6 +9,8 @@ const newsapi = new NewsAPI(process.env.NEWS_API_KEY);
 const Search = require('../models/search');
 
 const dt = new Date();
+const from = new Date();
+from.setDate(from.getDate() - 2);
 
 // Returns news articles for a GET request
 exports.getNews = async (req, res) => {
@@ -26,7 +28,8 @@ exports.getNews = async (req, res) => {
                 q: req.query.q,
                 category: req.query.category,
                 language: req.query.language,
-                sortBy: 'popularity'
+                sortBy: 'relevancy',
+                from: from.toISOString().substring(0, 10)
             }).then(async response => {
                 articlesArray = response.articles;
 
@@ -172,7 +175,8 @@ exports.sendNews = async (to, keyword, language, country) => {
                 q: keyword,
                 category: '',
                 language: language,
-                sortBy: 'popularity'
+                sortBy: 'relevancy',
+                from: from.toISOString().substring(0, 10)
             }).then(async response => {
                 articlesArray = response.articles;
 
