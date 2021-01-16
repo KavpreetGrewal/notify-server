@@ -25,7 +25,8 @@ exports.getNews = async (req, res) => {
                 q: req.query.q,
                 category: req.query.category,
                 language: req.query.language,
-                country: req.query.country
+                country: req.query.country,
+                sortBy: 'popularity'
             }).then(async response => {
                 articlesArray = response.articles;
 
@@ -155,7 +156,8 @@ exports.getArticle = async (to, keyword, language, country) => {
                 q: keyword,
                 category: '',
                 language: language,
-                country: country
+                country: country,
+                sortBy: 'popularity'
             }).then(async response => {
                 articlesArray = response.articles;
 
