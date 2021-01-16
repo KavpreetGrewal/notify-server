@@ -2,6 +2,7 @@ const Vonage = require('./sms');
 const dotenv = require('dotenv');
 dotenv.config();
 
+const axios = require("axios").default;
 const NewsAPI = require('newsapi');
 const newsapi = new NewsAPI(process.env.NEWS_API_KEY);
 
@@ -161,17 +162,34 @@ exports.getArticle = async (to, keyword, language, country) => {
             }).then(async response => {
                 articlesArray = response.articles;
 
+                let urlArray = [];
+                articlesArray.forEach((artObj) => urlArray.push(artObj.url));
+
+                axios.post('https://flask-backend-42.herokuapp.com/fetchNewsSummary', {
+                    url: urlArray
+                },{headers: { "Content-Type": "application/json"}}).then( res => {
+                    for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                        title = articlesArray[i].title;
+                        description = res.summaries[i];
+                        await send(title, description, to);
+                    }
+                }).catch( err => {
+
+                });
+
                 // Loops over articles and sends a max of 3
                 for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
                     title = articlesArray[i].title;
                     description = articlesArray[i].description;
 
-                    await send(title, description, to);
+                    //ALVDO
+
+                    // await send(title, description, to);
                 }
 
                 // Sends default SMS if there are no news articles found
                 if (articlesArray.length == 0) {
-                    Vonage.sendSMS("There were no articles matching your requests, please try again", req.query.number);
+                    // Vonage.sendSMS("There were no articles matching your requests, please try again", req.query.number);
                 }
 
                 // Creates search to be saved in DB
@@ -217,15 +235,15 @@ exports.getArticle = async (to, keyword, language, country) => {
                 title = articlesArray[i].title;
                 description = articlesArray[i].description;
 
-                await send(title, description, to);
+                // ALVDO
+                // await send(title, description, to);
             }
 
             // Sends default SMS if there are no news articles found
             if (articlesArray.length == 0) {
-                Vonage.sendSMS("There were no articles matching your requests, please try again", req.query.number);
+                // Vonage.sendSMS("There were no articles matching your requests, please try again", req.query.number);
             }
         }
-
     } catch (e) {
         console.log(e);
     }

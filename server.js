@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const newsRouter = require('./routes/news');
 const smsRouter = require('./routes/sms');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 const server = express();
 dotenv.config();
 
