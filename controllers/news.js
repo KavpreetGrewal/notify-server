@@ -21,7 +21,7 @@ exports.getNews = async (req, res) => {
         if (!searched) {
             let articlesArray = [];
 
-            newsapi.v2.topHeadlines({
+            newsapi.v2.everything({
                 q: req.query.q,
                 category: req.query.category,
                 language: req.query.language,
@@ -151,7 +151,7 @@ exports.getArticle = async (to, keyword, language, country) => {
         if (!(await checkDB(keyword, '', language, country))) {
             let articlesArray = [];
 
-            newsapi.v2.topHeadlines({
+            newsapi.v2.everything({
                 q: keyword,
                 category: '',
                 language: language,
