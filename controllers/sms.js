@@ -15,18 +15,17 @@ const vonage = new Vonage({
 // Fetches news articles based on the request
 exports.replySMS = async (req, res) => {
     const params = Object.assign(req.query, req.body);
-    console.log(params); // TODO
 
     // Gets the Info from the SMS
     const to = params.msisdn;
-    const text = params.text;
-    const info = getInfo(to);
+    let text = params.text;
+    const info = await getInfo(to);
     const language = info[0];
     const country = info[1];
 
-    console.log("hi");
+    // Sends text to chatbot and sends the messages
     await chatbot.handleIncomingMsg(to, text, language, country);
-    // await news.getArticle(to, text, language, country);
+
 
     // Ends the Webhook
     res.status(200).end();
@@ -51,22 +50,21 @@ const sendSMS = async (text, to) => {
     });
 }
 
-// sendSMS(`Title: `, '16479983024');
-
 exports.sendSMS = sendSMS;
 
-// TODO: connect with Vonage Insights
+
 // Gets the country and language of the client based on number
-const getInfo = (number) => {
+const getInfo = async (number) => {
     // get insights from number
     let array = [];
+    array.push('en');
+    array.push('us');
     vonage.numberInsight.get({level: 'basic', number: number}, (error, result) => {
         if(error) {
             console.error(error);
         }
         else {
-            array.push('en');
-            array.push(result.country_code.toLowerCase());
+           array.push(result.country_code.toLowerCase());
         }
     });
     return array;

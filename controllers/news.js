@@ -26,18 +26,38 @@ exports.getNews = async (req, res) => {
                 q: req.query.q,
                 category: req.query.category,
                 language: req.query.language,
-                country: req.query.country,
                 sortBy: 'popularity'
             }).then(async response => {
                 articlesArray = response.articles;
 
-                // Loops over articles and sends a max of 3
-                for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
-                    title = articlesArray[i].title;
-                    description = articlesArray[i].description;
+                let urlArray = [];
+                articlesArray.forEach((artObj) => urlArray.push(artObj.url));
 
-                    await send(title, description, req.query.number);
-                }
+                axios.post(process.env.TEXT_SUMMARIZER_URL, {
+                    url: urlArray
+                },{headers: { "Content-Type": "application/json"}}).then(async result => {
+                    let articles = [];
+
+                    for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                        title = articlesArray[i].title;
+                        description = result.data.summaries[i];
+
+                        articles.push({
+                            title: articlesArray[i].title,
+                            description: result.data.summaries[i]
+                        });
+
+                        await send(title, description, req.query.number);
+                    }
+
+                    res.status(200).send({
+                        articles: articles
+                    });
+                }).catch( err => {
+                    console.log(err);
+                });
+
+
 
                 // Creates search to be saved in DB
                 const search = new Search({
@@ -68,18 +88,6 @@ exports.getNews = async (req, res) => {
                             }
                         ]
                     });
-                } else {
-                    // Loops over articles and sends a max of 3
-                    let articles = [];
-                    for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
-                        articles.push({
-                            title: articlesArray[i].title,
-                            description: articlesArray[i].description
-                        });
-                    }
-                    res.status(200).send({
-                        articles: articles
-                    });
                 }
 
             }).catch(err => {
@@ -100,15 +108,34 @@ exports.getNews = async (req, res) => {
                 console.log(err);
             });
 
-            articlesArray = search.articles;
+            let articlesArray = search.articles;
 
-            // Loops over articles and sends a max of 3
-            for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
-                title = articlesArray[i].title;
-                description = articlesArray[i].description;
+            let urlArray = [];
+            articlesArray.forEach((artObj) => urlArray.push(artObj.url));
 
-                await send(title, description, req.query.number);
-            }
+            axios.post(process.env.TEXT_SUMMARIZER_URL, {
+                url: urlArray
+            },{headers: { "Content-Type": "application/json"}}).then(async result => {
+                let articles = [];
+
+                for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                    title = articlesArray[i].title;
+                    description = result.data.summaries[i];
+
+                    articles.push({
+                        title: articlesArray[i].title,
+                        description: result.data.summaries[i]
+                    });
+
+                    await send(title, description, req.query.number);
+                }
+
+                res.status(200).send({
+                    articles: articles
+                });
+            }).catch( err => {
+                console.log(err);
+            });
 
 
             // Sends default SMS if there are no news articles found
@@ -122,18 +149,6 @@ exports.getNews = async (req, res) => {
                         }
                     ]
                 });
-            } else {
-                // Loops over articles and sends a max of 3
-                let articles = [];
-                for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
-                    articles.push({
-                        title: articlesArray[i].title,
-                        description: articlesArray[i].description
-                    });
-                }
-                res.status(200).send({
-                    articles: articles
-                });
             }
         }
 
@@ -145,7 +160,7 @@ exports.getNews = async (req, res) => {
 
 
 
-exports.getArticle = async (to, keyword, language, country) => {
+exports.sendNews = async (to, keyword, language, country) => {
     try {
         let title = "No articles found ";
         let description = "Please try again or try a new search";
@@ -157,7 +172,6 @@ exports.getArticle = async (to, keyword, language, country) => {
                 q: keyword,
                 category: '',
                 language: language,
-                country: country,
                 sortBy: 'popularity'
             }).then(async response => {
                 articlesArray = response.articles;
@@ -165,31 +179,29 @@ exports.getArticle = async (to, keyword, language, country) => {
                 let urlArray = [];
                 articlesArray.forEach((artObj) => urlArray.push(artObj.url));
 
-                axios.post('https://flask-backend-42.herokuapp.com/fetchNewsSummary', {
+                axios.post(process.env.TEXT_SUMMARIZER_URL, {
                     url: urlArray
-                },{headers: { "Content-Type": "application/json"}}).then( res => {
+                },{headers: { "Content-Type": "application/json"}}).then(async result => {
+                    let articles = [];
+
                     for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
                         title = articlesArray[i].title;
-                        description = res.summaries[i];
+                        description = result.data.summaries[i];
+
+                        articles.push({
+                            title: articlesArray[i].title,
+                            description: result.data.summaries[i]
+                        });
+
                         await send(title, description, to);
                     }
                 }).catch( err => {
-
+                    console.log(err);
                 });
-
-                // Loops over articles and sends a max of 3
-                for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
-                    title = articlesArray[i].title;
-                    description = articlesArray[i].description;
-
-                    //ALVDO
-
-                    // await send(title, description, to);
-                }
 
                 // Sends default SMS if there are no news articles found
                 if (articlesArray.length == 0) {
-                    // Vonage.sendSMS("There were no articles matching your requests, please try again", req.query.number);
+                    Vonage.sendSMS("There were no articles matching your requests, please try again", to);
                 }
 
                 // Creates search to be saved in DB
@@ -230,18 +242,32 @@ exports.getArticle = async (to, keyword, language, country) => {
 
             articlesArray = search.articles;
 
-            // Loops over articles and sends a max of 3
-            for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
-                title = articlesArray[i].title;
-                description = articlesArray[i].description;
+            let urlArray = [];
+            articlesArray.forEach((artObj) => urlArray.push(artObj.url));
 
-                // ALVDO
-                // await send(title, description, to);
-            }
+            axios.post(process.env.TEXT_SUMMARIZER_URL, {
+                url: urlArray
+            },{headers: { "Content-Type": "application/json"}}).then(async result => {
+                let articles = [];
+
+                for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                    title = articlesArray[i].title;
+                    description = result.data.summaries[i];
+
+                    articles.push({
+                        title: articlesArray[i].title,
+                        description: result.data.summaries[i]
+                    });
+
+                    await send(title, description, to);
+                }
+            }).catch( err => {
+                console.log(err);
+            });
 
             // Sends default SMS if there are no news articles found
             if (articlesArray.length == 0) {
-                // Vonage.sendSMS("There were no articles matching your requests, please try again", req.query.number);
+                Vonage.sendSMS("There were no articles matching your requests, please try again", to);
             }
         }
     } catch (e) {
