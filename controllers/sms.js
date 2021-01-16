@@ -2,13 +2,15 @@ const Vonage = require('@vonage/server-sdk');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const news = require('./news');
+const chatbot = require('./chatbot');
+
 
 // Connects to Vonage
 const vonage = new Vonage({
     apiKey: process.env.NEXMO_API_KEY,
     apiSecret: process.env.NEXMO_API_SECRET
 });
+
 
 // Fetches news articles based on the request
 exports.replySMS = async (req, res) => {
@@ -22,14 +24,16 @@ exports.replySMS = async (req, res) => {
     const language = info[0];
     const country = info[1];
 
-    await news.getArticle(to, text, language, country);
+    console.log("hi");
+    await chatbot.handleIncomingMsg(to, text, language, country);
+    // await news.getArticle(to, text, language, country);
 
     // Ends the Webhook
     res.status(200).end();
 }
 
 // Handles requests to send SMS to user
-exports.sendSMS = async (text, to) => {
+const sendSMS = async (text, to) => {
     const from = process.env.PHONE_NUM;
 
     vonage.message.sendSms(from, to, text, {
@@ -46,6 +50,10 @@ exports.sendSMS = async (text, to) => {
         }
     });
 }
+
+// sendSMS(`Title: `, '16479983024');
+
+exports.sendSMS = sendSMS;
 
 // TODO: connect with Vonage Insights
 // Gets the country and language of the client based on number
