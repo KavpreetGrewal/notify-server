@@ -1,6 +1,9 @@
 let schedule = require('node-schedule');
+
+// IBM WATSON
 const AssistantV2 = require('ibm-watson/assistant/v2');
 const { IamAuthenticator } = require('ibm-watson/auth');
+
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -14,7 +17,7 @@ const assistant = new AssistantV2({
     version: '2018-09-19'
 });
 
-
+// Uses IBM Watson Assistant to parse messages
 exports.handleIncomingMsg = async(to, textMsg, language, country) => {
 
     if (textMsg.substring(0, 4).toLowerCase() === "news"){

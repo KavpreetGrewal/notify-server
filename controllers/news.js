@@ -58,8 +58,26 @@ exports.getNews = async (req, res) => {
                     res.status(200).send({
                         articles: articles
                     });
-                }).catch( err => {
+                }).catch(async err => {
                     console.log(err);
+
+                    let articles = [];
+
+                    for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                        title = articlesArray[i].title;
+                        description = articlesArray[i].description;
+
+                        articles.push({
+                            title: articlesArray[i].title,
+                            description: articlesArray[i].description
+                        });
+
+                        await send(title, description, req.query.number);
+                    }
+
+                    res.status(200).send({
+                        articles: articles
+                    });
                 });
 
 
@@ -140,8 +158,27 @@ exports.getNews = async (req, res) => {
                 res.status(200).send({
                     articles: articles
                 });
-            }).catch( err => {
+            }).catch(async err => {
                 console.log(err);
+
+                let articles = [];
+
+                for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                    title = articlesArray[i].title;
+                    description = articlesArray[i].description;
+
+                    articles.push({
+                        title: articlesArray[i].title,
+                        description: articlesArray[i].description
+                    });
+
+                    await send(title, description, req.query.number);
+                }
+
+                res.status(200).send({
+                    articles: articles
+                });
+
             });
 
 
@@ -192,21 +229,21 @@ exports.sendNews = async (to, keyword, language, country) => {
                 axios.post(process.env.TEXT_SUMMARIZER_URL, {
                     url: urlArray
                 },{headers: { "Content-Type": "application/json"}}).then(async result => {
-                    let articles = [];
 
                     for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
                         title = articlesArray[i].title;
                         description = result.data.summaries[i];
 
-                        articles.push({
-                            title: articlesArray[i].title,
-                            description: result.data.summaries[i]
-                        });
+                        await send(title, description, to);
+                    }
+                }).catch(async err => {
+                    console.log(err);
+                    for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                        title = articlesArray[i].title;
+                        description = articlesArray[i].description;
 
                         await send(title, description, to);
                     }
-                }).catch( err => {
-                    console.log(err);
                 });
 
                 // Sends default SMS if there are no news articles found
@@ -260,21 +297,21 @@ exports.sendNews = async (to, keyword, language, country) => {
             axios.post(process.env.TEXT_SUMMARIZER_URL, {
                 url: urlArray
             },{headers: { "Content-Type": "application/json"}}).then(async result => {
-                let articles = [];
 
                 for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
                     title = articlesArray[i].title;
                     description = result.data.summaries[i];
 
-                    articles.push({
-                        title: articlesArray[i].title,
-                        description: result.data.summaries[i]
-                    });
+                    await send(title, description, to);
+                }
+            }).catch(async err => {
+                console.log(err);
+                for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                    title = articlesArray[i].title;
+                    description = articlesArray[i].description;
 
                     await send(title, description, to);
                 }
-            }).catch( err => {
-                console.log(err);
             });
 
             // Sends default SMS if there are no news articles found
