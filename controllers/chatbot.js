@@ -51,7 +51,7 @@ exports.handleIncomingMsg = async(to, textMsg, language, country) => {
                         console.log('greeting');
 
                         await Vonage.sendSMS(text, to);
-                        await delay(1500);
+                        await delay(2000);
                         await Vonage.sendSMS(prompt, to);
                         await delay(2000);
                         await Vonage.sendSMS(schedule, to);
@@ -63,7 +63,7 @@ exports.handleIncomingMsg = async(to, textMsg, language, country) => {
                     } else {
                         console.log('other');
                         await Vonage.sendSMS(text, to);
-                        await delay(1500);
+                        await delay(2000);
                         await Vonage.sendSMS(prompt, to);
                         await delay(2000);
                         await Vonage.sendSMS(schedule, to);
@@ -73,7 +73,7 @@ exports.handleIncomingMsg = async(to, textMsg, language, country) => {
                     console.log('msg error');
                     console.log(err);
                     await Vonage.sendSMS(text, to);
-                    await delay(1500);
+                    await delay(2000);
                     await Vonage.sendSMS(prompt, to);
                     await delay(2000);
                     await Vonage.sendSMS(schedule, to);
@@ -82,7 +82,7 @@ exports.handleIncomingMsg = async(to, textMsg, language, country) => {
         console.log('cs error');
             console.log(err);
             await Vonage.sendSMS(text, to);
-            await delay(1500);
+            await delay(2000);
             await Vonage.sendSMS(prompt, to);
             await delay(2000);
             await Vonage.sendSMS(schedule, to);
