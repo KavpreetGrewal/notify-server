@@ -34,7 +34,9 @@ exports.getNews = async (req, res) => {
                 articlesArray = response.articles;
 
                 let urlArray = [];
-                articlesArray.forEach((artObj) => urlArray.push(artObj.url));
+                for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                    urlArray.push(articlesArray[i].url);
+                }
 
                 axios.post(process.env.TEXT_SUMMARIZER_URL, {
                     url: urlArray
@@ -114,7 +116,9 @@ exports.getNews = async (req, res) => {
             let articlesArray = search.articles;
 
             let urlArray = [];
-            articlesArray.forEach((artObj) => urlArray.push(artObj.url));
+            for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                urlArray.push(articlesArray[i].url);
+            }
 
             axios.post(process.env.TEXT_SUMMARIZER_URL, {
                 url: urlArray
@@ -181,7 +185,9 @@ exports.sendNews = async (to, keyword, language, country) => {
                 articlesArray = response.articles;
 
                 let urlArray = [];
-                articlesArray.forEach((artObj) => urlArray.push(artObj.url));
+                for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                    urlArray.push(articlesArray[i].url);
+                }
 
                 axios.post(process.env.TEXT_SUMMARIZER_URL, {
                     url: urlArray
@@ -247,7 +253,9 @@ exports.sendNews = async (to, keyword, language, country) => {
             articlesArray = search.articles;
 
             let urlArray = [];
-            articlesArray.forEach((artObj) => urlArray.push(artObj.url));
+            for (let i = 0; i < Math.min(articlesArray.length, 3); i++) {
+                urlArray.push(articlesArray[i].url);
+            }
 
             axios.post(process.env.TEXT_SUMMARIZER_URL, {
                 url: urlArray
