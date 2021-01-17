@@ -30,7 +30,7 @@ exports.handleIncomingMsg = async(to, textMsg, language, country) => {
         let keyword = textMsg.split(" ")[2].toLowerCase() || "business";
         let num = to;
         await Vonage.sendSMS(`Scheduling ${time} updates about ${keyword}`, to);
-        await scheduleUpdates(num, time, keyword);
+        // await scheduleUpdates(num, time, keyword);
         return;
     }
 
@@ -96,67 +96,67 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 
 
 // Schedule updates
-const scheduleUpdates = async (number, time, keyword) => {
-    // Creates user to be saved in DB
-    console.log(typeof number);
-    const user = new User({
-        number: number.toString(),
-        time: time,
-        keyword: keyword
-    });
-
-    // Saves user in DB
-    await user.save(err => {
-        if (err != null) {
-            console.log("User was not saved");
-            console.log(err);
-        }
-    });
-}
-
-
-
-const updateDaily = () => {
-    User.find().exec(async (err, users) => {
-        for (const user of users) {
-            let time = user.time;
-            if (time === "daily") {
-                await Vonage.sendSMS(`Checking news about ${user.keyword}...`, user.number);
-                await delay(1500);
-                await news.sendNews(user.number, user.keyword, 'en', 'us');
-            }
-        }
-    });
-}
-
-const updateWeekly = () => {
-    User.find().exec(async (err, users) => {
-        for (const user of users) {
-            let time = user.time;
-            if (time === "weekly") {
-                await Vonage.sendSMS(`Checking news about ${user.keyword}...`, user.number);
-                await delay(1500);
-                await news.sendNews(user.number, user.keyword, 'en', 'us');
-            }
-        }
-    });
-}
-
-const updateMonthly = () => {
-    User.find().exec(async (err, users) => {
-        for (const user of users) {
-            let time = user.time;
-            if (time === "monthly") {
-                await Vonage.sendSMS(`Checking news about ${user.keyword}...`, user.number);
-                await delay(1500);
-                await news.sendNews(user.number, user.keyword, 'en', 'us');
-            }
-        }
-    });
-}
-
-// Runs updates
-let daily = schedule.scheduleJob('0 8 * * *', updateDaily());
-let weekly = schedule.scheduleJob('0 8 * * 1', updateWeekly());
-let monthly = schedule.scheduleJob('0 8 1 * *', updateMonthly());
+// const scheduleUpdates = async (number, time, keyword) => {
+//     // Creates user to be saved in DB
+//     console.log(typeof number);
+//     const user = new User({
+//         number: number.toString(),
+//         time: time,
+//         keyword: keyword
+//     });
+//
+//     // Saves user in DB
+//     await user.save(err => {
+//         if (err != null) {
+//             console.log("User was not saved");
+//             console.log(err);
+//         }
+//     });
+// }
+//
+//
+//
+// const updateDaily = () => {
+//     User.find().exec(async (err, users) => {
+//         for (const user of users) {
+//             let time = user.time;
+//             if (time === "daily") {
+//                 await Vonage.sendSMS(`Checking news about ${user.keyword}...`, user.number);
+//                 await delay(1500);
+//                 await news.sendNews(user.number, user.keyword, 'en', 'us');
+//             }
+//         }
+//     });
+// }
+//
+// const updateWeekly = () => {
+//     User.find().exec(async (err, users) => {
+//         for (const user of users) {
+//             let time = user.time;
+//             if (time === "weekly") {
+//                 await Vonage.sendSMS(`Checking news about ${user.keyword}...`, user.number);
+//                 await delay(1500);
+//                 await news.sendNews(user.number, user.keyword, 'en', 'us');
+//             }
+//         }
+//     });
+// }
+//
+// const updateMonthly = () => {
+//     User.find().exec(async (err, users) => {
+//         for (const user of users) {
+//             let time = user.time;
+//             if (time === "monthly") {
+//                 await Vonage.sendSMS(`Checking news about ${user.keyword}...`, user.number);
+//                 await delay(1500);
+//                 await news.sendNews(user.number, user.keyword, 'en', 'us');
+//             }
+//         }
+//     });
+// }
+//
+// // Runs updates
+// let daily = schedule.scheduleJob('0 8 * * *', updateDaily());
+// let weekly = schedule.scheduleJob('0 8 * * 1', updateWeekly());
+// let monthly = schedule.scheduleJob('0 8 1 * *', updateMonthly());
 
