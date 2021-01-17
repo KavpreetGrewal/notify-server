@@ -51,8 +51,9 @@ exports.getNews = async (req, res) => {
                             title: articlesArray[i].title,
                             description: result.data.summaries[i]
                         });
-
-                        await send(title, description, req.query.number);
+                        if (req.query.number == null) {
+                            await send(title, description, req.query.number);
+                        }
                     }
 
                     res.status(200).send({
@@ -72,7 +73,9 @@ exports.getNews = async (req, res) => {
                             description: articlesArray[i].description
                         });
 
-                        await send(title, description, req.query.number);
+                        if (req.query.number == null) {
+                            await send(title, description, req.query.number);
+                        }
                     }
 
                     res.status(200).send({
@@ -101,7 +104,7 @@ exports.getNews = async (req, res) => {
                 });
 
                 // Sends default SMS if there are no news articles found
-                if (articlesArray.length == 0) {
+                if (articlesArray.length == 0 && req.query.number != null) {
                     Vonage.sendSMS("There were no articles matching your requests, please try again", req.query.number);
                     res.status(200).send({
                         articles: [
