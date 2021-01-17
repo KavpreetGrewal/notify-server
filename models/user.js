@@ -10,12 +10,12 @@ const userSchema = new mongoose.Schema({
     time: {
         type: String,
         trim: true,
-        required: false,
+        required: true,
     },
     keyword: {
         type: String,
         trim: true,
-        required: false,
+        required: true,
     }
 });
 
